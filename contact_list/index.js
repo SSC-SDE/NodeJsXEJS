@@ -62,7 +62,20 @@ app.post('/create-contact', function(req,res){
    return res.redirect('back');
 
 });
+//for deleting a contact get the query from the url, find the index if not -1 delete.
+app.get('/delete-contact',function(req,res){
+    
+    let phone = req.query.phone;
 
+    let contactIndex = contactList.findIndex(contact => contact.phone == phone);
+
+    if (contactIndex != -1){
+        contactList.splice(contactIndex, 1);
+    }
+
+    return res.redirect('back');
+
+});
 
 
 app.get('/practice', function(req, res){
