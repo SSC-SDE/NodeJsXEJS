@@ -40,7 +40,7 @@ var contactList = [
 
 ]
 
-
+//C:\Program Files\MongoDB\Server\7.0\data\
 
 app.get('/', function(req,res){
     //console.log('from the get route controller',req.myName);
