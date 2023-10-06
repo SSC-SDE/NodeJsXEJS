@@ -5,6 +5,8 @@ const port = 8000;
 
 const db = require('./config/mongoose');
 const Contact = require('./models/contact');
+const { default: mongoose } = require('mongoose');
+const contact = require('./models/contact');
 
 const app = express();
 
@@ -43,26 +45,62 @@ var contactList = [
 
 ]
 
+// const myPromise = new Promise(function(resolve,reject){
+//     const Contact = mongoose.model('Contact', contactList);
+//     Contact.create({
+//         name: res.body.name,
+//         phone: res.body.phone
+//     })
+// });
+
+// function insertContact() {
+//     Promise(function(resolve,reject){
+//         setTimeout((insertContact) => {
+//             const Contact = mongoose.model('Contact', contactList);
+//             Contact.create({
+//                 name: res.body.name,
+//                 phone: res.body.phone
+//             })
+//             const error = 'Opps, something broke';
+
+//             if(error) {
+//                 console.log('Error boi')
+//                 reject(error);
+//             } else {
+//                 console.log('We are in Else section- the promise should be resolved');
+//                 resolve(Contact);
+//             }
+//         }, 100000);
+
+// })};
+
 //C:\Program Files\MongoDB\Server\7.0\data\
 
 app.get('/', function(req,res){
     //console.log('from the get route controller',req.myName);
     return res.render('home', {
-
+        
         title:"contact_list",
         contact_list: contactList
     });
 });
 
-app.post('/create-contact', function(req,res){
-//    contactList.push({
-//         name: req.body.name,
-//         phone: req.body.phone
-//    });
 
-   contactList.push(req.body);
+app.post('/create-contact', function(req,res, next){
 
-   return res.redirect('back');
+
+
+       Contact.create({
+    name: req.body.name,
+    phone: req.body.phone
+   }, (err, newContact) => {
+           if (err) { console.log('error in creating a contact!'); return; };
+
+           console.log('********', newContact);
+           return res.redirect('back');
+       })
+    
+
 
 });
 //for deleting a contact get the query from the url, find the index if not -1 delete.
