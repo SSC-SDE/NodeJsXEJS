@@ -5,8 +5,6 @@ const port = 8000;
 
 const db = require('./config/mongoose');
 const Contact = require('./models/contact');
-const { default: mongoose } = require('mongoose');
-const contact = require('./models/contact');
 
 const app = express();
 
@@ -29,106 +27,81 @@ app.use(express.static('assets'));
 //     next();
 // });
 
-var contactList = [
-    {
-        name: "Shankhya",
-        phone: "123456789"
-    },
-    {
-        name: "Tony",
-        phone: "12222222"
-    },
-    {
-        name: "John Snow",
-        phone: "2441139"
-    }
+// var contactList = [
+//     {
+//         name: "Shankhya",
+//         phone: "123456789"
+//     },
+//     {
+//         name: "Tony",
+//         phone: "12222222"
+//     },
+//     {
+//         name: "John Snow",
+//         phone: "2441139"
+//     }
 
-]
+// ]
 
-// const myPromise = new Promise(function(resolve,reject){
-//     const Contact = mongoose.model('Contact', contactList);
-//     Contact.create({
-//         name: res.body.name,
-//         phone: res.body.phone
-//     })
-// });
 
-// function insertContact() {
-//     Promise(function(resolve,reject){
-//         setTimeout((insertContact) => {
-//             const Contact = mongoose.model('Contact', contactList);
-//             Contact.create({
-//                 name: res.body.name,
-//                 phone: res.body.phone
-//             })
-//             const error = 'Opps, something broke';
-
-//             if(error) {
-//                 console.log('Error boi')
-//                 reject(error);
-//             } else {
-//                 console.log('We are in Else section- the promise should be resolved');
-//                 resolve(Contact);
-//             }
-//         }, 100000);
-
-// })};
 
 //C:\Program Files\MongoDB\Server\7.0\data\
 
 app.get('/', function(req,res){
     //console.log('from the get route controller',req.myName);
-    return res.render('home', {
+    
+    Contact.find({},function(err,contacts){
+        if(err){
+            console.log('Error when fetching contact from db');
+            return;
+        }
+        return res.render('home', {
         
-        title:"contact_list",
-        contact_list: contactList
-    });
+            title:"contact_list",
+            contact_list: contacts
+        });
+    }) 
+    
+
 });
 
 
 app.post('/create-contact', function(req,res, next){
-
-
-
-       Contact.create({
+ 
+    Contact.create({
     name: req.body.name,
     phone: req.body.phone
-   }, (err, newContact) => {
+   }, function (err, newContact) {
            if (err) { console.log('error in creating a contact!'); return; };
 
            console.log('********', newContact);
            return res.redirect('back');
-       })
+       });
     
-
-
 });
 //for deleting a contact get the query from the url, find the index if not -1 delete.
 app.get('/delete-contact',function(req,res){
+    //get the id form quering the url 
+    let id = req.query.id;
     
-    let phone = req.query.phone;
+    
+    //find the contact in the db using id and delete
+    Contact.findByIdAndDelete(id, function(err){
+        if(err){
+            console.log("Error executing delete command in DB");
+            return;
+        }
+        return res.redirect('back');
+    });
 
-    let contactIndex = contactList.findIndex(contact => contact.phone == phone);
-
-    if (contactIndex != -1){
-        contactList.splice(contactIndex, 1);
-    }
-
-    return res.redirect('back');
-
+   
 });
-
 
 app.get('/practice', function(req, res){
     return res.render('practice', {
         title: "Contact List"
     });
 });
-
-
-
-
-
 
 app.listen(port, function(err){
     if(err){
